@@ -65,3 +65,5 @@ app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 // newUser
 //   .save()
 //   .then(user => console.log(user), e => console.log("Unable to save", e));
+
+module.exports = { app };
