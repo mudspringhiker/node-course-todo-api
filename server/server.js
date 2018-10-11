@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const { mongoose } = require("./db/mongoose");
 const { Todo } = require("./models/todo");
 const { User } = require("./models/user");
+const { ObjectId } = require("mongodb");
 
 const PORT = process.env.PORT || 3000;
 
@@ -12,7 +13,6 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post("/todos", (req, res) => {
-  // console.log(req.body);
   const todo = new Todo({
     text: req.body.text
   });
@@ -36,43 +36,23 @@ app.get("/todos", (req, res) => {
   );
 });
 
+// GET /todos/1234322
+app.get("/todos/:id", (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    res.status(404).send();
+  } else {
+    Todo.findById(id)
+      .then(todo => {
+        if (!todo) {
+          return res.status(404).send();
+        }
+        res.send({ todo });
+      })
+      .catch(e => res.status(404).send());
+  }
+});
+
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-
-// const newTodo = new Todo({
-//   text: "Buy gloves",
-//   completed: true
-// });
-
-// newTodo.save().then(
-//   doc => {
-//     console.log("Saved todo", doc);
-//   },
-//   e => {
-//     console.log("Unable to save todo");
-//   }
-// );
-
-// const otherTodo = new Todo({
-//   text: "Get lacinato kale"
-// });
-
-// otherTodo.save().then(
-//   doc => {
-//     console.log(JSON.stringify(doc, undefined, 2));
-//   },
-//   e => console.log("unable to save", e)
-// );
-
-// User = email, password, associated wth user
-//  email require, trim, set type, set min length 1
-
-// const newUser = new User({
-//   name: "Tom",
-//   email: "tom@eamil.com"
-// });
-
-// newUser
-//   .save()
-//   .then(user => console.log(user), e => console.log("Unable to save", e));
 
 module.exports = { app };
